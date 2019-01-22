@@ -1,0 +1,25 @@
+def address_flag(data,add_num):
+    data_1 = data[data['Address']==add_num]
+    add_count = len(data_1)
+    data_1 = data_1.sort_values('date_column',ascending=True)
+    
+    flag=0
+    
+    if len(data_1)>2:
+        date_diff = data_1['date_column'].diff(2).astype('timedelta64[D]').dropna().unique().tolist()
+        date_diff = [round(i) for i in date_diff]
+        count = [date_diff<25 for date_diff in date_diff]
+        if sum(count)>0:
+            flag=1
+    
+    final_data = pd.DataFrame({"Home Address":pd.Series(add_num), 
+                               "Flag var": pd.Series(flag),
+                               "Address_freq":pd.Series(add_count)})
+    
+    return(final_data)
+
+
+data_frame = pd.DataFrame({})
+for i in address_list:
+    data_frame = data_frame.append(address_flag(date_data,i))
+data_frame = data_frame.sort_values('Address_freq',ascending=False)
